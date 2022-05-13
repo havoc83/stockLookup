@@ -12,7 +12,7 @@ const getData = (ticker, res) => { fetch(`https://finance.yahoo.com/quote/${tick
   .then((resp) => {
     return resp.text().then((text) => {
       // This is a bit unnecessary in reality I would use a library to handle this parsing but I wanted to 
-      // keep this as minimalistic as possible so that there would not be a ton of libraries to install
+      // keep this as minimalistic as possible so that there would not be any installs
       let values = ["PREV_CLOSE", "OPEN", "BID", "ASK", "DAYS_RANGE", "FIFTY_TWO_WK_RANGE", "TD_VOLUME",
       "AVERAGE_VOLUME_3MONTH", "MARKET_CAP", "BETA_5Y", "PE_RATIO", "EPS_RATIO", "EARNINGS_DATE",
       "DIVIDEND_AND_YIELD", "EX_DIVIDEND_DATE", "ONE_YEAR_TARGET_PRICE"]
@@ -23,6 +23,7 @@ const getData = (ticker, res) => { fetch(`https://finance.yahoo.com/quote/${tick
         if(found === null) {
           continue
         }
+        // Simple way to exclude additional tags that might be surrounding the actual data (such as <span>)
         if(found[1].indexOf('>') !== -1) {
           results[v] = found[1].substring(found[1].indexOf('>') + 1, found[1].indexOf('<', 1))
         } else {
@@ -33,6 +34,7 @@ const getData = (ticker, res) => { fetch(`https://finance.yahoo.com/quote/${tick
       res.statusCode = 200
       res.setHeader('Content-Type', 'text/html')
       let data = fs.readFileSync('./index.html')
+      // Again would use a templating system in a larger application but this works for a simple prototype
       for (const val in results){
         data = data.toString().replace(`{ ${val} }`, results[val])
       }
